@@ -23,14 +23,43 @@ const categories = {
   "mes-sons":{title:"MES SONS",eyebrow:"TON ESPACE PERSONNEL",items:[]}
 };
 const grid=document.getElementById("soundGrid"), title=document.getElementById("sectionTitle"), eyebrow=document.getElementById("sectionEyebrow"), count=document.getElementById("soundCount"), state=document.getElementById("playbackState");
-let currentTab="attaque", masterVolume=.8, activeNodes=[];
-let audioContext=null;
-function getAudio(){if(!audioContext)audioContext=new(window.AudioContext||window.webkitAudioContext)();if(audioContext.state==="suspended")audioContext.resume();return audioContext}
-function playDemo(index){const ctx=getAudio(),osc=ctx.createOscillator(),gain=ctx.createGain();osc.type=index%3===0?"triangle":index%3===1?"sine":"sawtooth";const base=[440,523,659,784,880][index%5];osc.frequency.setValueAtTime(base,ctx.currentTime);osc.frequency.exponentialRampToValueAtTime(base*1.35,ctx.currentTime+.12);gain.gain.setValueAtTime(Math.max(.001,masterVolume*.16),ctx.currentTime);gain.gain.exponentialRampToValueAtTime(.001,ctx.currentTime+.42);osc.connect(gain);gain.connect(ctx.destination);const node={osc,gain};activeNodes.push(node);osc.onended=()=>{activeNodes=activeNodes.filter(n=>n!==node);if(!activeNodes.length){state.classList.remove("active");state.innerHTML='<span class="pulse"></span> Aucun son en lecture'}};osc.start();osc.stop(ctx.currentTime+.44);state.classList.add("active");state.innerHTML='<span class="pulse"></span> Son de démonstration en lecture'}
-function render(){const data=categories[currentTab];title.textContent=data.title;eyebrow.textContent=data.eyebrow;count.textContent=data.items.length?data.items.length+" sons":"Bientôt disponible";grid.innerHTML="";if(!data.items.length){grid.innerHTML='<div class="empty-state"><div>⭐</div><h3>TES SONS PERSONNELS</h3><p>L’import de fichiers MP3 et la création de boutons personnalisés seront ajoutés dans une prochaine version.</p></div>';return}data.items.forEach((item,i)=>{const b=document.createElement("button");b.className="sound-button "+item[3];b.innerHTML='<span class="sound-icon">'+item[1]+'</span><span class="sound-name">'+item[0]+'</span><span class="sound-type">'+item[2]+'</span>';b.addEventListener("click",()=>{document.querySelectorAll(".sound-button.playing").forEach(x=>x.classList.remove("playing"));b.classList.add("playing");playDemo(i)});grid.appendChild(b)})}
+let currentTab="attaque", masterVolume=.8, activeAudios=[];
+const realSounds={
+  buzzer:"https://sfxmint.com/dl/basketball-buzzer-01.mp3",
+  bounce:"https://sfxmint.com/dl/impact-bounce-15.mp3",
+  applause:"https://sfxmint.com/dl/crowd-applause-58.mp3",
+  cheer:"https://sfxmint.com/dl/crowd-chant-15.mp3",
+  chant:"https://sfxmint.com/dl/crowd-chant-05.mp3",
+  whistle:"https://sfxmint.com/dl/stadium-crowd-04.mp3",
+  groan:"https://sfxmint.com/dl/crowd-groan-01.mp3",
+  horn:"https://sfxmint.com/dl/goal-horn-01.mp3"
+};
+const soundForLabel={
+  "2 POINTS":"cheer","3 POINTS":"cheer","LANCER FRANC":"applause","DUNK":"horn",
+  "LAY-UP":"cheer","ALLEY-OOP":"horn","GROS PANIER":"cheer","BUZZER BEATER":"buzzer",
+  "GROS CONTRE":"cheer","INTERCEPTION":"bounce","REBOND DÉFENSIF":"bounce",
+  "FAUTE ATTAQUANT":"whistle","Sifflets":"whistle","Applaudissements":"applause",
+  "CLAP CLAP":"applause","CHANT DU PUBLIC":"chant","ALLEZ !":"chant",
+  "DÉFENSE !":"chant","HOURRA":"cheer","BOUcan":"cheer","VICTOIRE":"cheer",
+  "VICTOIRE !":"cheer","FIN DU QUART-TEMPS":"buzzer","FIN DU MATCH":"buzzer",
+  "BUZZER":"buzzer","MI-TEMPS":"buzzer","TEMPS MORT":"whistle","REPRISE":"buzzer",
+  "GROSSE DÉFENSE":"chant","CLAP DE DÉFENSE":"applause","BRAVO !":"applause"
+};
+function playRealSound(key){
+  const url=realSounds[key];
+  if(!url){state.classList.remove("active");state.innerHTML='<span class="pulse"></span> Son réel bientôt disponible';return}
+  const audio=new Audio(url);
+  audio.volume=masterVolume;
+  audio.preload="auto";
+  activeAudios.push(audio);
+  audio.addEventListener("ended",()=>{activeAudios=activeAudios.filter(a=>a!==audio);if(!activeAudios.length){state.classList.remove("active");state.innerHTML='<span class="pulse"></span> Aucun son en lecture'}});
+  audio.addEventListener("error",()=>{activeAudios=activeAudios.filter(a=>a!==audio);state.classList.remove("active");state.innerHTML='<span class="pulse"></span> Son indisponible — vérifie ta connexion'});
+  audio.play().then(()=>{state.classList.add("active");state.innerHTML='<span class="pulse"></span> Son réel en lecture'}).catch(()=>{activeAudios=activeAudios.filter(a=>a!==audio);state.classList.remove("active");state.innerHTML='<span class="pulse"></span> Appuie à nouveau pour autoriser le son'});
+}
+function render(){const data=categories[currentTab];title.textContent=data.title;eyebrow.textContent=data.eyebrow;count.textContent=data.items.length?data.items.length+" sons":"Bientôt disponible";grid.innerHTML="";if(!data.items.length){grid.innerHTML='<div class="empty-state"><div>⭐</div><h3>TES SONS PERSONNELS</h3><p>L’import de fichiers MP3 et la création de boutons personnalisés seront ajoutés dans une prochaine version.</p></div>';return}data.items.forEach((item,i)=>{const b=document.createElement("button");b.className="sound-button "+item[3];b.innerHTML='<span class="sound-icon">'+item[1]+'</span><span class="sound-name">'+item[0]+'</span><span class="sound-type">'+item[2]+'</span>';b.addEventListener("click",()=>{document.querySelectorAll(".sound-button.playing").forEach(x=>x.classList.remove("playing"));b.classList.add("playing");playRealSound(soundForLabel[item[0]])});grid.appendChild(b)})}
 document.querySelectorAll(".tab").forEach(b=>b.addEventListener("click",()=>{document.querySelector(".tab.active")?.classList.remove("active");b.classList.add("active");currentTab=b.dataset.tab;render()}));
-document.getElementById("masterVolume").addEventListener("input",e=>{masterVolume=Number(e.target.value)/100;document.getElementById("volumeValue").value=e.target.value+"%"});
-document.getElementById("stopAll").addEventListener("click",()=>{activeNodes.forEach(n=>{try{n.gain.gain.cancelScheduledValues(audioContext.currentTime);n.gain.gain.setTargetAtTime(0,audioContext.currentTime,.015);n.os.stop(audioContext.currentTime+.08)}catch(e){}});activeNodes=[];document.querySelectorAll(".sound-button.playing").forEach(x=>x.classList.remove("playing"));state.classList.remove("active");state.innerHTML='<span class="pulse"></span> Lecture arrêtée'});
+document.getElementById("masterVolume").addEventListener("input",e=>{masterVolume=Number(e.target.value)/100;document.getElementById("volumeValue").value=e.target.value+"%";activeAudios.forEach(a=>a.volume=masterVolume)});
+document.getElementById("stopAll").addEventListener("click",()=>{activeAudios.forEach(a=>{try{a.pause();a.currentTime=0}catch(e){}});activeAudios=[];document.querySelectorAll(".sound-button.playing").forEach(x=>x.classList.remove("playing"));state.classList.remove("active");state.innerHTML='<span class="pulse"></span> Lecture arrêtée'});
 document.getElementById("themeToggle").addEventListener("click",()=>document.body.classList.toggle("light"));
 if("serviceWorker"in navigator&&location.protocol!=="file:"){window.addEventListener("load",()=>navigator.serviceWorker.register("./sw.js").catch(()=>{}))}
 render();
