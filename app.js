@@ -45,10 +45,12 @@ const soundForLabel={
   "BUZZER":"buzzer","MI-TEMPS":"buzzer","TEMPS MORT":"whistle","REPRISE":"buzzer",
   "GROSSE DÉFENSE":"chant","CLAP DE DÉFENSE":"applause","BRAVO !":"applause"
 };
-function playRealSound(key){
+async function playRealSound(key){
   const url=realSounds[key];
   if(!url){state.classList.remove("active");state.innerHTML='<span class="pulse"></span> Son réel bientôt disponible';return}
-  const audio=new Audio(url);
+  let source=url;
+  try{const cache=await caches.open("basket-sound-audio-v1");const saved=await cache.match(url);if(saved)source=URL.createObjectURL(await saved.blob())}catch(e){}
+  const audio=new Audio(source);
   audio.volume=masterVolume;
   audio.preload="auto";
   activeAudios.push(audio);
@@ -59,6 +61,28 @@ function playRealSound(key){
 function render(){const data=categories[currentTab];title.textContent=data.title;eyebrow.textContent=data.eyebrow;count.textContent=data.items.length?data.items.length+" sons":"Bientôt disponible";grid.innerHTML="";if(!data.items.length){grid.innerHTML='<div class="empty-state"><div>⭐</div><h3>TES SONS PERSONNELS</h3><p>L’import de fichiers MP3 et la création de boutons personnalisés seront ajoutés dans une prochaine version.</p></div>';return}data.items.forEach((item,i)=>{const b=document.createElement("button");b.className="sound-button "+item[3];b.innerHTML='<span class="sound-icon">'+item[1]+'</span><span class="sound-name">'+item[0]+'</span><span class="sound-type">'+item[2]+'</span>';b.addEventListener("click",()=>{document.querySelectorAll(".sound-button.playing").forEach(x=>x.classList.remove("playing"));b.classList.add("playing");playRealSound(soundForLabel[item[0]])});grid.appendChild(b)})}
 document.querySelectorAll(".tab").forEach(b=>b.addEventListener("click",()=>{document.querySelector(".tab.active")?.classList.remove("active");b.classList.add("active");currentTab=b.dataset.tab;render()}));
 document.getElementById("masterVolume").addEventListener("input",e=>{masterVolume=Number(e.target.value)/100;document.getElementById("volumeValue").value=e.target.value+"%";activeAudios.forEach(a=>a.volume=masterVolume)});
+document.getElementById("downloadSounds").addEventListener("click",async()=>{
+  const button=document.getElementById("downloadSounds");
+  const urls=[...new Set(Object.values(realSounds))];
+  button.disabled=true;button.textContent="TÉLÉCHARGEMENT…";
+  state.classList.remove("active");state.innerHTML='<span class="pulse"></span> Enregistrement des sons…';
+  try{
+    const cache=await caches.open("basket-sound-audio-v1");
+    let done=0;
+    for(const url of urls){
+      if(await cache.match(url)){done++;continue}
+      const response=await fetch(url,{mode:"cors"});
+      if(!response.ok||response.type==="opaque")throw new Error("Téléchargement impossible");
+      await cache.put(url,response.clone());done++;
+      button.textContent="TÉLÉCHARGEMENT "+Math.round(done/urls.length*100)+"%";
+    }
+    state.innerHTML='<span class="pulse"></span> '+done+' sons enregistrés sur cet appareil';
+    button.textContent="SONS ENREGISTRÉS ✓";
+  }catch(e){
+    state.innerHTML='<span class="pulse"></span> Téléchargement interrompu — vérifie ta connexion';
+    button.textContent="RÉESSAYER LE TÉLÉCHARGEMENT";
+  }finally{button.disabled=false}
+});
 document.getElementById("stopAll").addEventListener("click",()=>{activeAudios.forEach(a=>{try{a.pause();a.currentTime=0}catch(e){}});activeAudios=[];document.querySelectorAll(".sound-button.playing").forEach(x=>x.classList.remove("playing"));state.classList.remove("active");state.innerHTML='<span class="pulse"></span> Lecture arrêtée'});
 document.getElementById("themeToggle").addEventListener("click",()=>document.body.classList.toggle("light"));
 if("serviceWorker"in navigator&&location.protocol!=="file:"){window.addEventListener("load",()=>navigator.serviceWorker.register("./sw.js").catch(()=>{}))}
