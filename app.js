@@ -24,6 +24,8 @@ const categories = {
 };
 const grid=document.getElementById("soundGrid"), title=document.getElementById("sectionTitle"), eyebrow=document.getElementById("sectionEyebrow"), count=document.getElementById("soundCount"), state=document.getElementById("playbackState");
 let currentTab="attaque", masterVolume=.8, activeAudios=[];
+const offlineSoundSources={};
+if("caches"in window){caches.open("basket-sound-audio-v1").then(async cache=>{for(const url of Object.values(realSounds)){const saved=await cache.match(url);if(saved)offlineSoundSources[url]=URL.createObjectURL(await saved.blob())}}).catch(()=>{})}
 const realSounds={
   buzzer:"https://sfxmint.com/dl/basketball-buzzer-01.mp3",
   bounce:"https://sfxmint.com/dl/impact-bounce-15.mp3",
@@ -45,12 +47,10 @@ const soundForLabel={
   "BUZZER":"buzzer","MI-TEMPS":"buzzer","TEMPS MORT":"whistle","REPRISE":"buzzer",
   "GROSSE DÉFENSE":"chant","CLAP DE DÉFENSE":"applause","BRAVO !":"applause"
 };
-async function playRealSound(key){
+function playRealSound(key){
   const url=realSounds[key];
   if(!url){state.classList.remove("active");state.innerHTML='<span class="pulse"></span> Son réel bientôt disponible';return}
-  let source=url;
-  try{const cache=await caches.open("basket-sound-audio-v1");const saved=await cache.match(url);if(saved)source=URL.createObjectURL(await saved.blob())}catch(e){}
-  const audio=new Audio(source);
+  const audio=new Audio(offlineSoundSources[url]||url);
   audio.volume=masterVolume;
   audio.preload="auto";
   activeAudios.push(audio);
@@ -73,7 +73,7 @@ document.getElementById("downloadSounds").addEventListener("click",async()=>{
       if(await cache.match(url)){done++;continue}
       const response=await fetch(url,{mode:"cors"});
       if(!response.ok||response.type==="opaque")throw new Error("Téléchargement impossible");
-      await cache.put(url,response.clone());done++;
+      await cache.put(url,response.clone());offlineSoundSources[url]=URL.createObjectURL(await response.clone().blob());done++;
       button.textContent="TÉLÉCHARGEMENT "+Math.round(done/urls.length*100)+"%";
     }
     state.innerHTML='<span class="pulse"></span> '+done+' sons enregistrés sur cet appareil';
