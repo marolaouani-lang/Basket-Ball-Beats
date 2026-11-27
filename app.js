@@ -37,7 +37,8 @@ const realSounds={
   horn:"https://sfxmint.com/dl/goal-horn-01.mp3",
   chantCall:"https://sfxmint.com/dl/crowd-chant-08.mp3",
   chantStop:"https://sfxmint.com/dl/crowd-chant-07.mp3",
-  groan2:"https://sfxmint.com/dl/crowd-groan-02.mp3"
+  groan2:"https://sfxmint.com/dl/crowd-groan-02.mp3",
+  laughter:"https://sfxmint.com/dl/crowd-chant-16.mp3"
 };
 const soundForLabel={
   "2 POINTS":"cheer","3 POINTS":"cheer","LANCER FRANC":"applause","DUNK":"cheer",
@@ -52,7 +53,7 @@ const soundForLabel={
   "CONTRE-ATTAQUE":"cheer","PASSE DÉCISIVE":"cheer","AND ONE":"cheer",
   "PRESSION !":"chant","STOP !":"whistle","VOL DE BALLE":"bounce",
   "CHARGE":"whistle","ON NE PASSE PAS":"chantStop",
-  "OLA":"cheer","TAMBOURS":"chantCall","HUMOUR":"groan2","HYPE !":"cheer",
+  "HUMOUR":"laughter","HYPE !":"cheer",
   "COUP D'ENVOI":"horn","FAUTE":"whistle","LANCERS FRANCS":"applause",
   "CHANGEMENT":"whistle","ARBITRE":"whistle"
 };
