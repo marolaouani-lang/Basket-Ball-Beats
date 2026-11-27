@@ -34,7 +34,10 @@ const realSounds={
   chant:"https://sfxmint.com/dl/crowd-chant-05.mp3",
   whistle:"https://sfxmint.com/dl/stadium-crowd-04.mp3",
   groan:"https://sfxmint.com/dl/crowd-groan-01.mp3",
-  horn:"https://sfxmint.com/dl/goal-horn-01.mp3"
+  horn:"https://sfxmint.com/dl/goal-horn-01.mp3",
+  chantCall:"https://sfxmint.com/dl/crowd-chant-08.mp3",
+  chantStop:"https://sfxmint.com/dl/crowd-chant-07.mp3",
+  groan2:"https://sfxmint.com/dl/crowd-groan-02.mp3"
 };
 const soundForLabel={
   "2 POINTS":"cheer","3 POINTS":"cheer","LANCER FRANC":"applause","DUNK":"cheer",
@@ -45,7 +48,13 @@ const soundForLabel={
   "DÉFENSE !":"chant","HOURRA":"cheer","BOUcan":"cheer","VICTOIRE":"cheer",
   "VICTOIRE !":"cheer","FIN DU QUART-TEMPS":"buzzer","FIN DU MATCH":"buzzer",
   "BUZZER":"buzzer","MI-TEMPS":"buzzer","TEMPS MORT":"whistle","REPRISE":"buzzer",
-  "GROSSE DÉFENSE":"chant","CLAP DE DÉFENSE":"applause","BRAVO !":"applause"
+  "GROSSE DÉFENSE":"chant","CLAP DE DÉFENSE":"applause","BRAVO !":"applause",
+  "CONTRE-ATTAQUE":"cheer","PASSE DÉCISIVE":"cheer","AND ONE":"cheer",
+  "PRESSION !":"chant","STOP !":"whistle","VOL DE BALLE":"bounce",
+  "CHARGE":"whistle","ON NE PASSE PAS":"chantStop",
+  "OLA":"cheer","TAMBOURS":"chantCall","HUMOUR":"groan2","HYPE !":"cheer",
+  "COUP D'ENVOI":"horn","FAUTE":"whistle","LANCERS FRANCS":"applause",
+  "CHANGEMENT":"whistle","ARBITRE":"whistle"
 };
 function playRealSound(key){
   const url=realSounds[key];
@@ -58,7 +67,7 @@ function playRealSound(key){
   audio.addEventListener("error",()=>{activeAudios=activeAudios.filter(a=>a!==audio);state.classList.remove("active");state.innerHTML='<span class="pulse"></span> Son indisponible — vérifie ta connexion'});
   audio.play().then(()=>{state.classList.add("active");state.innerHTML='<span class="pulse"></span> Son réel en lecture'}).catch(()=>{activeAudios=activeAudios.filter(a=>a!==audio);state.classList.remove("active");state.innerHTML='<span class="pulse"></span> Appuie à nouveau pour autoriser le son'});
 }
-function render(){const data=categories[currentTab];title.textContent=data.title;eyebrow.textContent=data.eyebrow;count.textContent=data.items.length?data.items.length+" sons":"Bientôt disponible";grid.innerHTML="";if(!data.items.length){grid.innerHTML='<div class="empty-state"><div>⭐</div><h3>TES SONS PERSONNELS</h3><p>L’import de fichiers MP3 et la création de boutons personnalisés seront ajoutés dans une prochaine version.</p></div>';return}data.items.forEach((item,i)=>{const b=document.createElement("button");b.className="sound-button "+item[3];b.innerHTML='<span class="sound-icon">'+item[1]+'</span><span class="sound-name">'+item[0]+'</span><span class="sound-type">'+item[2]+'</span>';b.addEventListener("click",()=>{document.querySelectorAll(".sound-button.playing").forEach(x=>x.classList.remove("playing"));b.classList.add("playing");playRealSound(soundForLabel[item[0]])});grid.appendChild(b)})}
+function render(){const data=categories[currentTab];title.textContent=data.title;eyebrow.textContent=data.eyebrow;count.textContent=data.items.length?data.items.length+" sons":"Bientôt disponible";grid.innerHTML="";if(!data.items.length){grid.innerHTML='<div class="empty-state"><div>⭐</div><h3>TES SONS PERSONNELS</h3><p>L’import de fichiers MP3 et la création de boutons personnalisés seront ajoutés dans une prochaine version.</p></div>';return}data.items.forEach((item,i)=>{const b=document.createElement("button");b.className="sound-button "+item[3];b.innerHTML='<span class="sound-icon">'+item[1]+'</span><span class="sound-name">'+item[0]+'</span><span class="sound-type">'+item[2]+'</span>';b.addEventListener("click",()=>{if(item[0]==="SILENCE..."){document.getElementById("stopAll").click();return}document.querySelectorAll(".sound-button.playing").forEach(x=>x.classList.remove("playing"));b.classList.add("playing");playRealSound(soundForLabel[item[0]])});grid.appendChild(b)})}
 document.querySelectorAll(".tab").forEach(b=>b.addEventListener("click",()=>{document.querySelector(".tab.active")?.classList.remove("active");b.classList.add("active");currentTab=b.dataset.tab;render()}));
 document.getElementById("masterVolume").addEventListener("input",e=>{masterVolume=Number(e.target.value)/100;document.getElementById("volumeValue").value=e.target.value+"%";activeAudios.forEach(a=>a.volume=masterVolume)});
 document.getElementById("downloadSounds").addEventListener("click",async()=>{
