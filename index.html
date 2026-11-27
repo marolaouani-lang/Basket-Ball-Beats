@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#10151d">
+  <meta name="description" content="BASKET SOUND DJ — la régie sonore de votre match de basket.">
+  <link rel="manifest" href="./manifest.webmanifest">
+  <link rel="stylesheet" href="./styles.css">
+  <title>BASKET SOUND DJ</title>
+</head>
+<body>
+  <div class="app-shell">
+    <header class="topbar">
+      <div class="brand">
+        <div class="brand-mark">🏀</div>
+        <div><p class="eyebrow">LA RÉGIE SONORE DU MATCH</p><h1>BASKET <span>SOUND DJ</span></h1></div>
+      </div>
+      <div class="top-actions">
+        <span class="live-pill"><i></i> PRÊT À JOUER</span>
+        <button class="icon-button" id="themeToggle" aria-label="Changer de thème" title="Changer de thème">☼</button>
+      </div>
+    </header>
+
+    <main>
+      <nav class="tabs" aria-label="Catégories de sons">
+        <button class="tab active" data-tab="attaque">⚡ <span>Attaque</span></button>
+        <button class="tab" data-tab="defense">🛡️ <span>Défense</span></button>
+        <button class="tab" data-tab="ambiance">🎉 <span>Ambiance</span></button>
+        <button class="tab" data-tab="match">⏱️ <span>Match</span></button>
+        <button class="tab" data-tab="mes-sons">⭐ <span>Mes sons</span></button>
+      </nav>
+
+      <section class="section-heading">
+        <div><p class="eyebrow" id="sectionEyebrow">FAIRE EXPLOSER LE COMPTEUR</p><h2 id="sectionTitle">ATTAQUE</h2></div>
+        <div class="section-meta"><span id="soundCount">12 sons</span><span class="keyboard-hint">Appuie sur un bouton pour lancer un son</span></div>
+      </section>
+
+      <section class="sound-grid" id="soundGrid" aria-live="polite"></section>
+
+      <section class="control-bar">
+        <div class="volume-control">
+          <label for="masterVolume">VOLUME GÉNÉRAL</label>
+          <input id="masterVolume" type="range" min="0" max="100" value="80">
+          <output id="volumeValue">80%</output>
+        </div>
+        <div class="playback-state" id="playbackState"><span class="pulse"></span> Aucun son en lecture</div>
+        <button class="stop-button" id="stopAll">■ <span>STOP ALL</span></button>
+      </section>
+    </main>
+    <footer><span>BASKET SOUND DJ</span><span>Prototype de démonstration · Sons temporaires</span></footer>
+  </div>
+  <script src="./app.js"></script>
+</body>
+</html>
