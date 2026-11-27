@@ -38,7 +38,7 @@ const realSounds={
   chantCall:"https://sfxmint.com/dl/crowd-chant-08.mp3",
   chantStop:"https://sfxmint.com/dl/crowd-chant-07.mp3",
   groan2:"https://sfxmint.com/dl/crowd-groan-02.mp3",
-  laughter:"https://sfxmint.com/dl/crowd-chant-16.mp3"
+  laughter:"https://sfxmint.com/dl/baby-babble-09.mp3"
 };
 const soundForLabel={
   "2 POINTS":"cheer","3 POINTS":"cheer","LANCER FRANC":"applause","DUNK":"cheer",
