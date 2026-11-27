@@ -35,8 +35,8 @@ const realSounds={
   horn:"https://sfxmint.com/dl/goal-horn-01.mp3"
 };
 const soundForLabel={
-  "2 POINTS":"cheer","3 POINTS":"cheer","LANCER FRANC":"applause","DUNK":"horn",
-  "LAY-UP":"cheer","ALLEY-OOP":"horn","GROS PANIER":"cheer","BUZZER BEATER":"buzzer",
+  "2 POINTS":"cheer","3 POINTS":"cheer","LANCER FRANC":"applause","DUNK":"cheer",
+  "LAY-UP":"cheer","ALLEY-OOP":"cheer","GROS PANIER":"cheer","BUZZER BEATER":"buzzer",
   "GROS CONTRE":"cheer","INTERCEPTION":"bounce","REBOND DÉFENSIF":"bounce",
   "FAUTE ATTAQUANT":"whistle","Sifflets":"whistle","Applaudissements":"applause",
   "CLAP CLAP":"applause","CHANT DU PUBLIC":"chant","ALLEZ !":"chant",
