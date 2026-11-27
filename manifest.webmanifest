@@ -1,0 +1,12 @@
+{
+  "name": "BASKET SOUND DJ",
+  "short_name": "Basket DJ",
+  "description": "La régie sonore de votre match de basket.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "landscape",
+  "background_color": "#0b1017",
+  "theme_color": "#10151d",
+  "lang": "fr"
+}
